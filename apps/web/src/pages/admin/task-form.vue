@@ -2,6 +2,9 @@
   <view class="page">
     <text class="page-title">{{ isEdit ? '编辑委托' : '发布委托' }}</text>
     <view class="form">
+      <picker :range="templateNames" :value="templateIndex" @change="onTemplate">
+        <view class="field picker-field">模板：{{ templateNames[templateIndex] ?? '不使用模板' }}</view>
+      </picker>
       <input v-model="form.title" class="field" placeholder="标题" />
       <textarea v-model="form.description" class="field area" placeholder="描述" />
       <picker :range="categoryNames" :value="categoryIndex" @change="onCategory">
@@ -70,16 +73,30 @@ interface CategoryRow {
   name: string;
 }
 
+interface TemplateRow {
+  id: string;
+  name: string;
+  titlePrefix: string;
+  description: string;
+  difficulty: string;
+  xpReward: number;
+  maxMembers: number;
+  acceptMode: 'bounty' | 'assigned';
+  needReview: boolean;
+}
+
 const difficulties = ['D', 'C', 'B', 'A', 'S'];
 const acceptModes = ['悬赏委托', '指派委托'];
 const categories = ref<CategoryRow[]>([]);
 const users = ref<UserRow[]>([]);
+const templates = ref<TemplateRow[]>([]);
 const isEdit = ref(false);
 const editId = ref('');
 const categoryIndex = ref(0);
 const difficultyIndex = ref(1);
 const acceptModeIndex = ref(0);
 const captainIndex = ref(0);
+const templateIndex = ref(0);
 const assigneeIds = ref<string[]>([]);
 const form = reactive({
   title: '',
@@ -92,12 +109,14 @@ const form = reactive({
 });
 
 const categoryNames = computed(() => ['未分类', ...categories.value.map((item) => item.name)]);
+const templateNames = computed(() => ['不使用模板', ...templates.value.map((item) => item.name)]);
 const captainNames = computed(() => ['无', ...users.value.filter((item) => assigneeIds.value.includes(item.id)).map((item) => item.nickname)]);
 const xpDefault = computed(() => DIFFICULTY_XP[difficulties[difficultyIndex.value] as keyof typeof DIFFICULTY_XP]);
 
 async function loadOptions() {
   categories.value = await request<CategoryRow[]>({ url: '/categories' });
   users.value = await request<UserRow[]>({ url: '/users' });
+  templates.value = await request<TemplateRow[]>({ url: '/task-templates' });
 }
 
 function onCategory(event: { detail: { value: string | number } }) {
@@ -110,6 +129,21 @@ function onDifficulty(event: { detail: { value: string | number } }) {
 
 function onAcceptMode(event: { detail: { value: string | number } }) {
   acceptModeIndex.value = Number(event.detail.value);
+}
+
+function onTemplate(event: { detail: { value: string | number } }) {
+  templateIndex.value = Number(event.detail.value);
+  const template = templates.value[templateIndex.value - 1];
+  if (!template) {
+    return;
+  }
+  form.title = template.titlePrefix;
+  form.description = template.description || '';
+  form.xpReward = template.xpReward;
+  form.maxMembers = template.maxMembers;
+  form.needReview = template.needReview;
+  acceptModeIndex.value = template.acceptMode === 'assigned' ? 1 : 0;
+  difficultyIndex.value = Math.max(0, difficulties.indexOf(template.difficulty));
 }
 
 function onCaptain(event: { detail: { value: string | number } }) {

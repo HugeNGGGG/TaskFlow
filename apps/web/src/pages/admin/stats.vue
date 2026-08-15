@@ -1,6 +1,9 @@
 <template>
   <view class="page">
-    <text class="page-title">员工统计</text>
+    <view class="page-head">
+      <text class="page-title">员工统计</text>
+      <text class="export-link" @tap="exportCsv">导出 CSV</text>
+    </view>
     <view v-for="row in rows" :key="row.user.id" class="card">
       <view class="head">
         <text class="name">{{ row.user.nickname }}</text>
@@ -21,12 +24,36 @@
 import { ref } from 'vue';
 import { onShow } from '@dcloudio/uni-app';
 import type { MemberStatsRow } from '@task-guild/shared';
-import { request } from '../../api/client';
+import { getAccessToken, PUBLIC_ORIGIN, request } from '../../api/client';
 
 const rows = ref<MemberStatsRow[]>([]);
 
 async function load() {
   rows.value = await request<MemberStatsRow[]>({ url: '/stats/members' });
+}
+
+function exportCsv() {
+  uni.downloadFile({
+    url: `${PUBLIC_ORIGIN}/api/v1/reports/export-tasks`,
+    header: {
+      Authorization: `Bearer ${getAccessToken()}`,
+    },
+    success: (response) => {
+      if (response.statusCode >= 200 && response.statusCode < 300) {
+        // #ifdef H5
+        window.open(response.tempFilePath, '_blank');
+        // #endif
+        // #ifndef H5
+        uni.openDocument({ filePath: response.tempFilePath, showMenu: true });
+        // #endif
+      } else {
+        uni.showToast({ title: '导出失败', icon: 'none' });
+      }
+    },
+    fail: () => {
+      uni.showToast({ title: '导出失败，请稍后重试', icon: 'none' });
+    },
+  });
 }
 
 onShow(() => {
@@ -42,6 +69,15 @@ onShow(() => {
   font-family: var(--font-display);
   font-size: var(--font-lg);
   font-weight: 700;
+}
+.page-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.export-link {
+  color: var(--color-brass);
+  font-size: var(--font-sm);
 }
 .card {
   background: var(--card-bg);

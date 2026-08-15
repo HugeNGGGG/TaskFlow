@@ -13,6 +13,44 @@ enum UserStatus {
   disabled
 }
 
+enum PunchType {
+  IN
+  OUT
+}
+
+enum PunchSource {
+  GPS
+  MANUAL
+}
+
+enum SessionStatus {
+  NORMAL
+  MISSING_IN
+  MISSING_OUT
+  CORRECTED
+}
+
+enum CorrectionStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  CANCELLED
+}
+
+enum LeaveType {
+  ANNUAL
+  SICK
+  PERSONAL
+  COMP_TIME
+  BUSINESS_TRIP
+}
+
+enum LeaveStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
 enum Difficulty {
   D
   C
@@ -140,6 +178,11 @@ model User {
   titles             UserTitle[]
   notifications      Notification[]
   announcements      Announcement[]
+  comments           TaskComment[]
+  punchRecords       PunchRecord[]
+  workSessions       WorkSession[]
+  corrections        CorrectionRequest[]
+  leaveRequests      LeaveRequest[]
 
   @@index([departmentId])
   @@index([status])
@@ -203,6 +246,8 @@ model Task {
   attachments Attachment[]
   reviews     Review[]
   extensions  DeadlineExtension[]
+  comments    TaskComment[]
+  subtasks    TaskSubtask[]
 
   @@index([status, deadlineAt])
   @@index([categoryId])
@@ -231,6 +276,121 @@ model TaskAssignment {
 
   @@unique([taskId, userId])
   @@index([userId, status])
+}
+
+model TaskComment {
+  id        String   @id @default(cuid())
+  taskId    String
+  authorId  String
+  content   String
+  createdAt DateTime @default(now())
+
+  task   Task @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  author User @relation(fields: [authorId], references: [id], onDelete: Restrict)
+
+  @@index([taskId, createdAt])
+}
+
+model TaskSubtask {
+  id        String   @id @default(cuid())
+  taskId    String
+  title     String
+  isDone    Boolean  @default(false)
+  sort      Int      @default(0)
+  createdAt DateTime @default(now())
+
+  task Task @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
+  @@index([taskId, sort])
+}
+
+model TaskTemplate {
+  id          String     @id @default(cuid())
+  name        String     @unique
+  titlePrefix String
+  description String     @default("")
+  difficulty  Difficulty
+  xpReward    Int
+  maxMembers  Int        @default(1)
+  acceptMode  AcceptMode
+  needReview  Boolean    @default(true)
+  createdAt   DateTime   @default(now())
+}
+
+model PunchRecord {
+  id          String      @id @default(cuid())
+  userId      String
+  user        User        @relation(fields: [userId], references: [id])
+  type        PunchType
+  punchTime   DateTime
+  workContent String      @default("")
+  latitude    Float?
+  longitude   Float?
+  source      PunchSource @default(MANUAL)
+  createdAt   DateTime    @default(now())
+
+  @@index([userId, punchTime])
+}
+
+model WorkSession {
+  id              String        @id @default(cuid())
+  userId          String
+  user            User          @relation(fields: [userId], references: [id])
+  date            String
+  startTime       DateTime
+  endTime         DateTime?
+  durationMinutes Int?
+  status          SessionStatus @default(NORMAL)
+  note            String?
+  createdAt       DateTime      @default(now())
+  corrections     CorrectionRequest[]
+
+  @@index([userId, date])
+}
+
+model CorrectionRequest {
+  id            String           @id @default(cuid())
+  userId        String
+  user          User             @relation(fields: [userId], references: [id])
+  sessionId     String?
+  session       WorkSession?     @relation(fields: [sessionId], references: [id])
+  date          String
+  type          PunchType
+  requestedTime DateTime
+  reason        String
+  status        CorrectionStatus @default(PENDING)
+  reviewedById  String?
+  reviewedAt    DateTime?
+  adminNote     String?
+  createdAt     DateTime         @default(now())
+
+  @@index([userId, status])
+}
+
+model LeaveRequest {
+  id         String      @id @default(cuid())
+  userId     String
+  user       User        @relation(fields: [userId], references: [id])
+  leaveType  LeaveType
+  startDate  String
+  endDate    String
+  reason     String
+  status     LeaveStatus @default(PENDING)
+  approverId String?
+  reviewedAt DateTime?
+  createdAt  DateTime    @default(now())
+
+  @@index([userId, status])
+}
+
+model CompanySetting {
+  id                String   @id @default("default")
+  standardWorkHours Float    @default(8)
+  deductLunch       Boolean  @default(false)
+  lunchStart        String   @default("12:00")
+  lunchEnd          String   @default("13:00")
+  workdays          String   @default("MON,TUE,WED,THU,FRI")
+  updatedAt         DateTime @updatedAt
 }
 
 model TaskEvent {

@@ -1,6 +1,12 @@
 <template>
   <view class="page">
-    <text class="page-title">总览看板</text>
+    <view class="page-head">
+      <text class="page-title">总览看板</text>
+      <view class="head-actions">
+        <text class="display-link" @tap="openAttendance">考勤管理</text>
+        <text class="display-link" @tap="openDisplay">打开大屏</text>
+      </view>
+    </view>
     <view class="cards">
       <view v-for="card in cards" :key="card.label" class="stat-card">
         <text class="num">{{ card.value }}</text>
@@ -119,6 +125,19 @@ function onTrendChange(event: { detail: { value: string | number } }) {
   void load();
 }
 
+function openDisplay() {
+  // #ifdef H5
+  window.open('/#/pages/display/index', '_blank');
+  // #endif
+  // #ifndef H5
+  uni.navigateTo({ url: '/pages/display/index' });
+  // #endif
+}
+
+function openAttendance() {
+  uni.navigateTo({ url: '/pages/admin/attendance' });
+}
+
 function renderChart() {
   // #ifdef H5
   const element = document.getElementById('trend-chart') as HTMLElement | null;
@@ -161,6 +180,19 @@ onShow(() => {
   font-family: var(--font-display);
   font-size: var(--font-lg);
   font-weight: 700;
+}
+.page-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.display-link {
+  color: var(--color-brass);
+  font-size: var(--font-sm);
+}
+.head-actions {
+  display: flex;
+  gap: var(--space-3);
 }
 .cards {
   display: grid;

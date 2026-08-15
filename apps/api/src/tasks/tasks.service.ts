@@ -109,6 +109,7 @@ export class TasksService {
         take: pageSize,
         include: {
           category: { select: { name: true } },
+          assignments: { select: { progressPercent: true } },
           _count: { select: { assignments: true } },
         },
       }),
@@ -130,6 +131,7 @@ export class TasksService {
         status: task.status,
         acceptCount: task._count.assignments,
         maxMembers: task.maxMembers,
+        progressPercent: this.taskProgressPercent(task),
         overdue:
           task.overdueAt !== null ||
           (task.deadlineAt.getTime() < now &&
@@ -151,6 +153,7 @@ export class TasksService {
         task: {
           include: {
             category: { select: { name: true } },
+            assignments: { select: { progressPercent: true } },
             _count: { select: { assignments: true } },
           },
         },
@@ -172,6 +175,7 @@ export class TasksService {
       status: task.status,
       acceptCount: task._count.assignments,
       maxMembers: task.maxMembers,
+      progressPercent: this.taskProgressPercent(task),
       overdue:
         task.overdueAt !== null ||
         (task.deadlineAt.getTime() < now &&
@@ -1085,6 +1089,22 @@ export class TasksService {
       }
       seq += 1;
     }
+  }
+
+  private taskProgressPercent(task: {
+    status: TaskStatus;
+    assignments: { progressPercent: number }[];
+  }): number {
+    if (task.status === 'completed' || task.status === 'pending_review') {
+      return 100;
+    }
+    if (task.status !== 'in_progress' || task.assignments.length === 0) {
+      return 0;
+    }
+    return Math.round(
+      task.assignments.reduce((sum, item) => sum + item.progressPercent, 0) /
+        task.assignments.length,
+    );
   }
 
   private emitStatus(taskId: string, status: string): void {

@@ -10,6 +10,12 @@ import { NotificationsModule } from './notifications/notifications.module';
 import { GamificationModule } from './gamification/gamification.module';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
+import { CommentsModule } from './comments/comments.module';
+import { SubtasksModule } from './subtasks/subtasks.module';
+import { TemplatesModule } from './templates/templates.module';
+import { ReportsModule } from './reports/reports.module';
+import { SearchModule } from './search/search.module';
+import { AttendanceModule } from './attendance/attendance.module';
 import { DepartmentsModule } from './departments/departments.module';
 import { CategoriesModule } from './categories/categories.module';
 import { TasksModule } from './tasks/tasks.module';
@@ -29,6 +35,12 @@ import { HealthController } from './health/health.controller';
     GamificationModule,
     AuthModule,
     UsersModule,
+    CommentsModule,
+    SubtasksModule,
+    TemplatesModule,
+    ReportsModule,
+    SearchModule,
+    AttendanceModule,
     DepartmentsModule,
     CategoriesModule,
     TasksModule,

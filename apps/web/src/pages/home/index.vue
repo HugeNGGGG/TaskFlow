@@ -14,6 +14,7 @@
           </view>
         </view>
         <view class="top-actions">
+          <view class="search-entry" @tap="goSearch">搜索</view>
           <text class="status-dot" />
           <text class="status-text">实时同步已连接</text>
           <image v-if="auth.user?.avatarUrl" class="avatar avatar-img" :src="auth.user.avatarUrl" mode="aspectFill" />
@@ -72,9 +73,9 @@
           <text class="quick-title">任务大厅</text>
           <text class="quick-desc">浏览悬赏、指派与进行中的委托</text>
         </view>
-        <view class="quick-card" @tap="goMine">
-          <text class="quick-title">我的委托</text>
-          <text class="quick-desc">查看自己的进度、提交与审核状态</text>
+        <view class="quick-card" @tap="goMyWork">
+          <text class="quick-title">我的工作台</text>
+          <text class="quick-desc">查看今日待办、进行中、待审核与最近完成</text>
         </view>
         <view class="quick-card" @tap="goMessages">
           <text class="quick-title">消息中心</text>
@@ -83,6 +84,10 @@
         <view class="quick-card" @tap="goProfile">
           <text class="quick-title">个人中心</text>
           <text class="quick-desc">等级、积分、称号与战绩</text>
+        </view>
+        <view class="quick-card" @tap="goAttendance">
+          <text class="quick-title">考勤打卡</text>
+          <text class="quick-desc">上下班打卡、工时记录与补卡申请</text>
         </view>
       </view>
     </view>
@@ -114,8 +119,12 @@ function goHall() {
   uni.switchTab({ url: '/pages/index/index' });
 }
 
-function goMine() {
-  uni.switchTab({ url: '/pages/mine/index' });
+function goSearch() {
+  uni.navigateTo({ url: '/pages/search/index' });
+}
+
+function goMyWork() {
+  uni.navigateTo({ url: '/pages/my-work/index' });
 }
 
 function goMessages() {
@@ -124,6 +133,10 @@ function goMessages() {
 
 function goProfile() {
   uni.switchTab({ url: '/pages/me/index' });
+}
+
+function goAttendance() {
+  uni.navigateTo({ url: '/pages/attendance/index' });
 }
 
 function goAdmin() {
@@ -215,6 +228,18 @@ onShow(() => {
   display: flex;
   align-items: center;
   gap: 12px;
+}
+.search-entry {
+  height: 38px;
+  padding: 0 15px;
+  border-radius: 11px;
+  display: inline-flex;
+  align-items: center;
+  color: #f2ce85;
+  font-size: 13px;
+  font-weight: 700;
+  background: rgba(255, 255, 255, 0.055);
+  border: 1px solid rgba(224, 170, 60, 0.22);
 }
 .status-dot {
   width: 9px;

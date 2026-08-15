@@ -7,6 +7,36 @@
       }
     },
     {
+      "path": "pages/my-work/index",
+      "style": {
+        "navigationBarTitleText": "我的工作台"
+      }
+    },
+    {
+      "path": "pages/search/index",
+      "style": {
+        "navigationBarTitleText": "全局搜索"
+      }
+    },
+    {
+      "path": "pages/attendance/index",
+      "style": {
+        "navigationBarTitleText": "考勤打卡"
+      }
+    },
+    {
+      "path": "pages/attendance/records",
+      "style": {
+        "navigationBarTitleText": "考勤记录"
+      }
+    },
+    {
+      "path": "pages/attendance/leave",
+      "style": {
+        "navigationBarTitleText": "请假调休"
+      }
+    },
+    {
       "path": "pages/index/index",
       "style": {
         "navigationBarTitleText": "委托板"
@@ -73,6 +103,24 @@
       }
     },
     {
+      "path": "pages/admin/attendance",
+      "style": {
+        "navigationBarTitleText": "考勤管理"
+      }
+    },
+    {
+      "path": "pages/admin/attendance-settings",
+      "style": {
+        "navigationBarTitleText": "考勤设置"
+      }
+    },
+    {
+      "path": "pages/admin/attendance-dashboard",
+      "style": {
+        "navigationBarTitleText": "考勤看板"
+      }
+    },
+    {
       "path": "pages/admin/announcements",
       "style": {
         "navigationBarTitleText": "公告管理"
@@ -88,6 +136,14 @@
       "path": "pages/admin/settings",
       "style": {
         "navigationBarTitleText": "系统设置"
+      }
+    },
+    {
+      "path": "pages/display/index",
+      "style": {
+        "navigationBarTitleText": "公会大屏",
+        "navigationBarTextStyle": "white",
+        "navigationBarBackgroundColor": "#0E1118"
       }
     }
   ],

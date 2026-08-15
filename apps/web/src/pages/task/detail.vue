@@ -40,6 +40,21 @@
       </view>
     </view>
 
+    <view class="section">
+      <text class="section-title">检查清单</text>
+      <view class="subtask-row" v-for="item in subtasks" :key="item.id">
+        <view class="checkbox" :class="{ checked: item.isDone }" @tap="toggleSubtask(item)">
+          <text v-if="item.isDone">✓</text>
+        </view>
+        <text class="subtask-title" :class="{ done: item.isDone }">{{ item.title }}</text>
+        <text class="subtask-delete" @tap="deleteSubtask(item)">删除</text>
+      </view>
+      <view class="add-row">
+        <input v-model="subtaskText" class="note" placeholder="添加子任务" />
+        <button class="btn small" @tap="addSubtask">添加</button>
+      </view>
+    </view>
+
     <view v-if="task.myAssignment && ['accepted', 'in_progress'].includes(task.myAssignment.status)" class="section">
       <text class="section-title">更新进度</text>
       <slider :value="progressPercent" :min="0" :max="100" :step="5" @change="onProgressChange" />
@@ -83,6 +98,7 @@
       <view v-for="file in visibleFiles" :key="file.id" class="file-row" @tap="downloadFile(file.id)">
         <text class="file-name">{{ file.logicalName }}</text>
         <text class="file-meta">v{{ file.version }} · {{ file.uploaderName }} · {{ formatSize(file.sizeBytes) }}</text>
+        <text v-if="canPreview(file)" class="preview-link" @tap.stop="previewFile(file.id)">预览</text>
       </view>
       <view v-if="visibleFiles.length === 0" class="muted">暂无附件</view>
     </view>
@@ -97,6 +113,21 @@
           </text>
           <text class="timeline-time">{{ formatDateTime(event.createdAt) }}</text>
         </view>
+      </view>
+    </view>
+
+    <view class="section">
+      <text class="section-title">评论</text>
+      <view v-for="comment in comments" :key="comment.id" class="comment-row">
+        <view class="comment-head">
+          <text class="comment-author">{{ comment.author?.nickname ?? '已注销用户' }}</text>
+          <text class="comment-time">{{ formatDateTime(comment.createdAt) }}</text>
+        </view>
+        <text class="comment-content">{{ comment.content }}</text>
+      </view>
+      <view class="add-row">
+        <input v-model="commentText" class="note" placeholder="输入评论，可用 @昵称 提醒同事" />
+        <button class="btn small" @tap="addComment">评论</button>
       </view>
     </view>
 
@@ -167,6 +198,20 @@ interface ExtensionView {
   requester: { nickname: string } | null;
 }
 
+interface TaskComment {
+  id: string;
+  content: string;
+  createdAt: string;
+  author: { id: string; nickname: string; avatarUrl: string | null } | null;
+}
+
+interface Subtask {
+  id: string;
+  title: string;
+  isDone: boolean;
+  sort: number;
+}
+
 const auth = useAuthStore();
 const task = ref<TaskDetail | null>(null);
 const progressPercent = ref(0);
@@ -177,6 +222,10 @@ const activeArea = ref('source');
 const extension = ref({ reason: '', deadline: '' });
 const extensions = ref<ExtensionView[]>([]);
 const acceptSuccess = ref(false);
+const comments = ref<TaskComment[]>([]);
+const commentText = ref('');
+const subtasks = ref<Subtask[]>([]);
+const subtaskText = ref('');
 let realtime: RealtimeClient | null = null;
 let pollTimer: ReturnType<typeof setInterval> | null = null;
 
@@ -205,6 +254,8 @@ async function load() {
   progressPercent.value = task.value.myAssignment?.progressPercent ?? 0;
   files.value = await request<AttachmentView[]>({ url: `/tasks/${id}/attachments` });
   extensions.value = await request<ExtensionView[]>({ url: `/tasks/${id}/extensions` });
+  comments.value = await request<TaskComment[]>({ url: `/tasks/${id}/comments` });
+  subtasks.value = await request<Subtask[]>({ url: `/tasks/${id}/subtasks` });
   realtime?.subscribeTask(id);
   if (pollTimer) {
     clearInterval(pollTimer);
@@ -354,6 +405,35 @@ async function downloadFile(fileId: string) {
   }
 }
 
+function canPreview(file: AttachmentView): boolean {
+  return (
+    file.mimeType.startsWith('image/') ||
+    file.mimeType === 'application/pdf' ||
+    /\.(png|jpe?g|gif|webp|pdf)$/i.test(file.fileName)
+  );
+}
+
+async function previewFile(fileId: string) {
+  try {
+    const result = await request<{ url: string }>({
+      url: `/attachments/${fileId}/presign`,
+    });
+    // #ifdef H5
+    window.open(result.url, '_blank');
+    // #endif
+    // #ifndef H5
+    uni.downloadFile({
+      url: result.url,
+      success: (response) => {
+        uni.openDocument({ filePath: response.tempFilePath, showMenu: false });
+      },
+    });
+    // #endif
+  } catch (error) {
+    uni.showToast({ title: (error as { message: string }).message, icon: 'none' });
+  }
+}
+
 async function requestExtension() {
   if (!task.value || !extension.value.reason || !extension.value.deadline) {
     uni.showToast({ title: '请填写理由与新的截止时间', icon: 'none' });
@@ -385,6 +465,91 @@ async function decideExtension(extensionId: string, approve: boolean) {
     data: { approve },
   });
   await load();
+}
+
+async function addComment() {
+  if (!task.value || !commentText.value.trim()) {
+    uni.showToast({ title: '请输入评论内容', icon: 'none' });
+    return;
+  }
+  try {
+    await request({
+      url: `/tasks/${task.value.id}/comments`,
+      method: 'POST',
+      data: { content: commentText.value.trim() },
+    });
+    commentText.value = '';
+    await loadComments();
+  } catch (error) {
+    uni.showToast({ title: (error as { message: string }).message, icon: 'none' });
+  }
+}
+
+async function loadComments() {
+  if (!task.value) {
+    return;
+  }
+  comments.value = await request<TaskComment[]>({
+    url: `/tasks/${task.value.id}/comments`,
+  });
+}
+
+async function addSubtask() {
+  if (!task.value || !subtaskText.value.trim()) {
+    uni.showToast({ title: '请输入子任务内容', icon: 'none' });
+    return;
+  }
+  try {
+    await request({
+      url: `/tasks/${task.value.id}/subtasks`,
+      method: 'POST',
+      data: { title: subtaskText.value.trim() },
+    });
+    subtaskText.value = '';
+    await loadSubtasks();
+  } catch (error) {
+    uni.showToast({ title: (error as { message: string }).message, icon: 'none' });
+  }
+}
+
+async function loadSubtasks() {
+  if (!task.value) {
+    return;
+  }
+  subtasks.value = await request<Subtask[]>({
+    url: `/tasks/${task.value.id}/subtasks`,
+  });
+}
+
+async function toggleSubtask(subtask: Subtask) {
+  if (!task.value) {
+    return;
+  }
+  try {
+    await request({
+      url: `/tasks/${task.value.id}/subtasks/${subtask.id}`,
+      method: 'PATCH',
+      data: { isDone: !subtask.isDone },
+    });
+    await loadSubtasks();
+  } catch (error) {
+    uni.showToast({ title: (error as { message: string }).message, icon: 'none' });
+  }
+}
+
+async function deleteSubtask(subtask: Subtask) {
+  if (!task.value) {
+    return;
+  }
+  try {
+    await request({
+      url: `/tasks/${task.value.id}/subtasks/${subtask.id}`,
+      method: 'DELETE',
+    });
+    await loadSubtasks();
+  } catch (error) {
+    uni.showToast({ title: (error as { message: string }).message, icon: 'none' });
+  }
 }
 
 function formatDateTime(value: string): string {
@@ -639,6 +804,10 @@ onUnload(() => {
 .file-name {
   font-weight: 600;
 }
+.preview-link {
+  color: var(--color-brass);
+  font-size: var(--font-xs);
+}
 .timeline-row {
   align-items: flex-start;
   border-bottom: none;
@@ -852,5 +1021,81 @@ onUnload(() => {
 @keyframes pop-in {
   from { transform: scale(0.76); opacity: 0; }
   to { transform: scale(1); opacity: 1; }
+}
+</style>
+
+<style scoped>
+.subtask-row,
+.add-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) 0;
+}
+.checkbox {
+  width: 24px;
+  height: 24px;
+  border-radius: 8px;
+  display: grid;
+  place-items: center;
+  color: #241a08;
+  font-size: 15px;
+  font-weight: 800;
+  background: rgba(255, 255, 255, 0.055);
+  border: 1px solid rgba(224, 170, 60, 0.30);
+  flex-shrink: 0;
+}
+.checkbox.checked {
+  background: linear-gradient(145deg, #f2cf77, #c8902c);
+  border-color: rgba(224, 170, 60, 0.35);
+}
+.subtask-title {
+  flex: 1;
+  color: #eef1f8;
+  font-size: 14px;
+}
+.subtask-title.done {
+  color: #77849a;
+  text-decoration: line-through;
+}
+.subtask-delete {
+  color: #ffb2a8;
+  font-size: 12px;
+}
+.add-row {
+  margin-top: var(--space-3);
+}
+.note {
+  flex: 1;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-2);
+  background: var(--color-bg);
+  font-size: var(--font-xs);
+}
+.comment-row {
+  padding: var(--space-3) 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+}
+.comment-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.comment-author {
+  color: #f2ce85;
+  font-weight: 700;
+  font-size: 14px;
+}
+.comment-time {
+  color: #7f8aa0;
+  font-size: 12px;
+}
+.comment-content {
+  display: block;
+  margin-top: 7px;
+  color: #e8ecf6;
+  font-size: 14px;
+  line-height: 1.6;
 }
 </style>

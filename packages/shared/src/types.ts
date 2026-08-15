@@ -38,6 +38,7 @@ export interface TaskCard {
   status: TaskStatus;
   acceptCount: number;
   maxMembers: number;
+  progressPercent: number;
   overdue: boolean;
   publishedAt: string | null;
 }
