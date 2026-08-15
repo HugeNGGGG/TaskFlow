@@ -1,0 +1,77 @@
+[
+  {
+    "route": "home",
+    "overflow": false,
+    "console_errors": [
+      "Failed to load resource: net::ERR_CONNECTION_CLOSED",
+      "Failed to load resource: net::ERR_CONNECTION_CLOSED"
+    ]
+  },
+  {
+    "route": "my-work",
+    "overflow": false,
+    "console_errors": [
+      "Failed to load resource: net::ERR_CONNECTION_CLOSED"
+    ]
+  },
+  {
+    "route": "task-detail",
+    "overflow": false,
+    "console_errors": [
+      "WebSocket connection to 'wss://guild.example.com/socket.io/?EIO=4&transport=websocket' failed: Error in connection establishment: net::ERR_CONNECTION_CLOSED",
+      "Failed to load resource: net::ERR_CONNECTION_CLOSED"
+    ]
+  },
+  {
+    "route": "display",
+    "overflow": false,
+    "console_errors": [
+      "Failed to load resource: net::ERR_CONNECTION_CLOSED",
+      "Failed to load resource: net::ERR_CONNECTION_CLOSED"
+    ]
+  },
+  {
+    "route": "settings",
+    "overflow": false,
+    "console_errors": [
+      "Failed to load resource: net::ERR_CONNECTION_CLOSED"
+    ]
+  },
+  {
+    "route": "search",
+    "overflow": false,
+    "console_errors": [
+      "WebSocket connection to 'wss://guild.example.com/socket.io/?EIO=4&transport=websocket' failed: Error in connection establishment: net::ERR_CONNECTION_CLOSED"
+    ]
+  },
+  {
+    "route": "attendance",
+    "overflow": false,
+    "console_errors": [
+      "Failed to load resource: net::ERR_CONNECTION_CLOSED",
+      "Failed to load resource: net::ERR_CONNECTION_CLOSED"
+    ]
+  },
+  {
+    "route": "attendance-records",
+    "overflow": false,
+    "console_errors": [
+      "Failed to load resource: net::ERR_CONNECTION_CLOSED"
+    ]
+  },
+  {
+    "route": "attendance-leave",
+    "overflow": false,
+    "console_errors": [
+      "Failed to load resource: net::ERR_CONNECTION_CLOSED",
+      "WebSocket connection to 'wss://guild.example.com/socket.io/?EIO=4&transport=websocket' failed: Error in connection establishment: net::ERR_CONNECTION_CLOSED"
+    ]
+  },
+  {
+    "route": "attendance-dashboard",
+    "overflow": false,
+    "console_errors": [
+      "Failed to load resource: net::ERR_CONNECTION_CLOSED"
+    ]
+  }
+]
