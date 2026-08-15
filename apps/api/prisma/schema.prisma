@@ -1,0 +1,424 @@
+generator client {
+  provider     = "prisma-client"
+  output       = "../src/generated/prisma"
+  moduleFormat = "cjs"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum UserStatus {
+  active
+  disabled
+}
+
+enum Difficulty {
+  D
+  C
+  B
+  A
+  S
+}
+
+enum AcceptMode {
+  bounty
+  assigned
+}
+
+enum TaskStatus {
+  draft
+  open
+  in_progress
+  pending_review
+  completed
+  cancelled
+}
+
+enum AssignmentRole {
+  member
+  captain
+}
+
+enum AssignmentStatus {
+  accepted
+  in_progress
+  submitted
+  completed
+}
+
+enum TaskEventType {
+  created
+  accepted
+  progress
+  submitted
+  approved
+  rejected
+  extension_requested
+  extension_decided
+  cancelled
+  reminder
+}
+
+enum ReviewDecision {
+  approved
+  rejected
+}
+
+enum ExtensionStatus {
+  pending
+  approved
+  rejected
+}
+
+enum AttachmentArea {
+  source
+  process
+  result
+}
+
+enum XpReason {
+  task_complete
+  urgent_bonus
+  on_time_bonus
+  early_bonus
+  late_penalty
+  reject_penalty
+  manual
+}
+
+enum NotificationType {
+  assign
+  review_result
+  deadline_warning
+  xp_award
+  title_award
+  system
+}
+
+enum TitleCondition {
+  first_complete
+  streak
+  firefighting
+  perfect
+  high_yield
+  level_reach
+}
+
+model Department {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  createdAt DateTime @default(now())
+  members   User[]
+}
+
+model User {
+  id                String     @id @default(cuid())
+  username          String     @unique
+  passwordHash      String
+  nickname          String
+  avatarUrl         String?
+  departmentId      String?
+  department        Department? @relation(fields: [departmentId], references: [id], onDelete: SetNull)
+  roleMask          Int        @default(1)
+  status            UserStatus @default(active)
+  notificationPrefs Json       @default("{}")
+  createdAt         DateTime   @default(now())
+  updatedAt         DateTime   @updatedAt
+
+  wechat             UserWechat?
+  refreshTokens      RefreshToken[]
+  publishedTasks     Task[]             @relation("PublishedTasks")
+  assignments        TaskAssignment[]
+  events             TaskEvent[]
+  uploads            Attachment[]
+  reviews            Review[]
+  extensionRequests  DeadlineExtension[] @relation("ExtensionRequesters")
+  extensionDecisions DeadlineExtension[] @relation("ExtensionDeciders")
+  xp                 XpLedger[]
+  stats              UserStats?
+  titles             UserTitle[]
+  notifications      Notification[]
+  announcements      Announcement[]
+
+  @@index([departmentId])
+  @@index([status])
+}
+
+model UserWechat {
+  userId  String   @id
+  openid  String   @unique
+  unionid String?
+  boundAt DateTime @default(now())
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model RefreshToken {
+  id        String    @id @default(cuid())
+  userId    String
+  tokenHash String    @unique
+  expiresAt DateTime
+  revokedAt DateTime?
+  createdAt DateTime  @default(now())
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model TaskCategory {
+  id       String  @id @default(cuid())
+  name     String  @unique
+  sort     Int     @default(0)
+  isActive Boolean @default(true)
+  tasks    Task[]
+}
+
+model Task {
+  id           String         @id @default(cuid())
+  taskNo       String         @unique
+  title        String
+  description  String         @default("")
+  categoryId   String?
+  category     TaskCategory?  @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  difficulty   Difficulty
+  xpReward     Int
+  deadlineAt   DateTime
+  acceptMode   AcceptMode
+  maxMembers   Int            @default(1)
+  needReview   Boolean        @default(true)
+  isUrgent     Boolean        @default(false)
+  status       TaskStatus     @default(draft)
+  publisherId  String
+  publisher    User           @relation("PublishedTasks", fields: [publisherId], references: [id])
+  overdueAt    DateTime?
+  publishedAt  DateTime?
+  completedAt  DateTime?
+  cancelledAt  DateTime?
+  cancelReason String?
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+
+  assignments TaskAssignment[]
+  events      TaskEvent[]
+  attachments Attachment[]
+  reviews     Review[]
+  extensions  DeadlineExtension[]
+
+  @@index([status, deadlineAt])
+  @@index([categoryId])
+  @@index([isUrgent, status])
+  @@index([publisherId])
+  @@index([overdueAt])
+}
+
+model TaskAssignment {
+  id              String           @id @default(cuid())
+  taskId          String
+  userId          String
+  role            AssignmentRole   @default(member)
+  status          AssignmentStatus @default(accepted)
+  progressPercent Int              @default(0)
+  joinedAt        DateTime         @default(now())
+  submittedAt     DateTime?
+  completedAt     DateTime?
+  xpAwarded       Int?
+  createdAt       DateTime         @default(now())
+
+  task    Task         @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  user    User         @relation(fields: [userId], references: [id])
+  events  TaskEvent[]
+  reviews Review[]
+
+  @@unique([taskId, userId])
+  @@index([userId, status])
+}
+
+model TaskEvent {
+  id              String         @id @default(cuid())
+  taskId          String
+  assignmentId    String?
+  authorId        String?
+  type            TaskEventType
+  progressPercent Int?
+  content         String?
+  payload         Json?
+  createdAt       DateTime       @default(now())
+
+  task       Task           @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  assignment TaskAssignment? @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+  author     User?          @relation(fields: [authorId], references: [id], onDelete: SetNull)
+
+  @@index([taskId, createdAt])
+  @@index([assignmentId])
+}
+
+model Review {
+  id           String         @id @default(cuid())
+  taskId       String
+  assignmentId String
+  reviewerId   String
+  decision     ReviewDecision
+  reason       String?
+  reviewedAt   DateTime       @default(now())
+
+  task       Task           @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  assignment TaskAssignment @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+  reviewer   User           @relation(fields: [reviewerId], references: [id], onDelete: Restrict)
+
+  @@index([assignmentId, reviewedAt])
+  @@index([taskId])
+}
+
+model DeadlineExtension {
+  id                String          @id @default(cuid())
+  taskId            String
+  requesterId       String
+  requestedDeadline DateTime
+  reason            String
+  status            ExtensionStatus @default(pending)
+  decidedById       String?
+  decidedAt         DateTime?
+  decidedReason     String?
+  createdAt         DateTime        @default(now())
+
+  task      Task   @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  requester User   @relation("ExtensionRequesters", fields: [requesterId], references: [id], onDelete: Restrict)
+  decidedBy User?  @relation("ExtensionDeciders", fields: [decidedById], references: [id], onDelete: SetNull)
+
+  @@index([taskId, status])
+}
+
+model Attachment {
+  id          String         @id @default(cuid())
+  taskId      String
+  area        AttachmentArea
+  logicalName String
+  version     Int
+  storageKey  String         @unique
+  fileName    String
+  mimeType    String
+  sizeBytes   Int
+  sha256      String?
+  uploaderId  String
+  createdAt   DateTime       @default(now())
+
+  task     Task @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  uploader User @relation(fields: [uploaderId], references: [id], onDelete: Restrict)
+
+  @@unique([taskId, area, logicalName, version])
+  @@index([taskId, area])
+}
+
+model XpLedger {
+  id        String   @id @default(cuid())
+  userId    String
+  amount    Int
+  reason    XpReason
+  refTaskId String?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+}
+
+model UserStats {
+  userId                 String   @id
+  totalXp                Int      @default(0)
+  level                  Int      @default(1)
+  points                 Int      @default(0)
+  acceptedCount          Int      @default(0)
+  completedCount         Int      @default(0)
+  overdueCount           Int      @default(0)
+  onTimeCount            Int      @default(0)
+  rejectedCount          Int      @default(0)
+  streakWeeks            Int      @default(0)
+  perfectStreak          Int      @default(0)
+  lastCompletedWeek      String?
+  totalCompletionSeconds Int      @default(0)
+  updatedAt              DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Level {
+  id          String  @id @default(cuid())
+  level       Int     @unique
+  name        String
+  xpThreshold Int
+  icon        String?
+  frame       String?
+}
+
+model Title {
+  id             String         @id @default(cuid())
+  code           String         @unique
+  name           String
+  description    String
+  conditionType  TitleCondition
+  conditionValue Int
+  pointsReward   Int            @default(10)
+  holders        UserTitle[]
+}
+
+model UserTitle {
+  id        String   @id @default(cuid())
+  userId    String
+  titleId   String
+  awardedAt DateTime @default(now())
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title Title @relation(fields: [titleId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, titleId])
+}
+
+model Notification {
+  id        String           @id @default(cuid())
+  userId    String
+  type      NotificationType
+  title     String
+  content   String
+  link      String?
+  isRead    Boolean          @default(false)
+  readAt    DateTime?
+  createdAt DateTime         @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, isRead, createdAt])
+}
+
+model Announcement {
+  id          String    @id @default(cuid())
+  title       String
+  content     String
+  authorId    String
+  isPinned    Boolean   @default(false)
+  publishedAt DateTime  @default(now())
+  expiresAt   DateTime?
+
+  author User @relation(fields: [authorId], references: [id], onDelete: Restrict)
+
+  @@index([publishedAt])
+}
+
+model SystemConfig {
+  id          String   @id @default(cuid())
+  key         String   @unique
+  value       Json
+  updatedById String?
+  updatedAt   DateTime @updatedAt
+}
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  actorId    String?
+  action     String
+  targetType String
+  targetId   String?
+  detail     Json?
+  createdAt  DateTime @default(now())
+
+  @@index([createdAt])
+}

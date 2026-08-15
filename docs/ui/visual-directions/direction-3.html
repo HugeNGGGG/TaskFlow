@@ -1,0 +1,219 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>视觉方向 3 · 暗夜冒险指挥舱</title>
+<style>
+  :root {
+    --bg0: #0f1117;
+    --bg1: #151923;
+    --bg2: #1b2130;
+    --surface: #202738;
+    --ink: #eef1f8;
+    --muted: #9aa5bb;
+    --line: #2e3649;
+    --amber: #d8a33a;
+    --amber-soft: #3a2c17;
+    --red: #e06a5f;
+    --teal: #54b98e;
+    --blue: #7ea0e8;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; width: 1440px; height: 1024px; overflow: hidden; }
+  body {
+    font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+    color: var(--ink);
+    background:
+      radial-gradient(circle at 70% -10%, rgba(216,163,58,.11), transparent 34%),
+      radial-gradient(circle at 15% 110%, rgba(126,160,232,.07), transparent 30%),
+      linear-gradient(180deg, #0f1117, #141824);
+  }
+  .app { display: grid; grid-template-columns: 224px 1fr; height: 100%; }
+
+  .sidebar {
+    padding: 27px 18px;
+    border-right: 1px solid #272e3e;
+    background: linear-gradient(180deg, rgba(24,29,42,.96), rgba(15,17,23,.96));
+    display: flex;
+    flex-direction: column;
+  }
+  .brand { display: flex; align-items: center; gap: 12px; padding: 0 9px 30px; }
+  .sigil {
+    width: 42px; height: 42px; border-radius: 12px;
+    display: grid; place-items: center;
+    color: #241a08; font-weight: 800; font-family: Georgia, "Noto Serif SC", serif;
+    background: linear-gradient(145deg, #f1c96f, #c8902c 60%, #8a5f1a);
+    box-shadow: 0 0 0 1px rgba(241,201,111,.28), 0 8px 24px rgba(216,163,58,.18);
+  }
+  .brand strong { font-family: Georgia, "Noto Serif SC", "Songti SC", serif; font-size: 18px; letter-spacing: .05em; }
+  .brand small { display: block; margin-top: 4px; color: #78839a; font-size: 12px; }
+  .nav { display: grid; gap: 7px; }
+  .nav-item {
+    height: 44px; display: flex; align-items: center; gap: 12px;
+    padding: 0 13px; border-radius: 10px; color: #8d98ad; font-size: 14px;
+    border-left: 2px solid transparent;
+  }
+  .nav-item.active { color: #f5d58f; background: linear-gradient(90deg, rgba(216,163,58,.14), rgba(216,163,58,.03)); border-left-color: var(--amber); }
+  .glyph { width: 8px; height: 8px; border: 1px solid #7b8598; transform: rotate(45deg); }
+  .nav-item.active .glyph { border-color: #d8a33a; background: #d8a33a; box-shadow: 0 0 12px rgba(216,163,58,.5); }
+  .side-card { margin-top: auto; padding: 15px; border: 1px solid #2d3548; border-radius: 14px; background: #181d29; }
+  .side-card .label { color: #8d98ad; font-size: 12px; }
+  .side-card strong { display: block; margin: 8px 0; font-size: 22px; font-family: Georgia, serif; color: #f2c26e; }
+  .side-card .bar { height: 5px; border-radius: 99px; background: #2a3141; overflow: hidden; }
+  .side-card .bar span { display: block; height: 100%; width: 68%; background: linear-gradient(90deg, #d8a33a, #f2d78e); }
+
+  .main { display: flex; flex-direction: column; min-width: 0; }
+  .topbar {
+    height: 76px; padding: 0 30px; display: flex; align-items: center; justify-content: space-between;
+    border-bottom: 1px solid #272e3e; background: rgba(20,24,33,.86);
+  }
+  .status { display: flex; align-items: center; gap: 9px; color: #9aa5bb; font-size: 13px; }
+  .pulse { width: 9px; height: 9px; border-radius: 50%; background: #54b98e; box-shadow: 0 0 0 6px rgba(84,185,142,.11), 0 0 16px rgba(84,185,142,.5); }
+  .actions { display: flex; align-items: center; gap: 12px; }
+  .command {
+    height: 40px; padding: 0 17px; border-radius: 10px; border: 1px solid #67511f;
+    color: #241a08; font-weight: 700; background: linear-gradient(180deg, #e4b758, #c8902c);
+    box-shadow: 0 0 22px rgba(216,163,58,.18);
+  }
+  .avatar { width: 38px; height: 38px; border-radius: 50%; border: 1px solid #4b4130; background: #2b2a22; color: #f2c26e; display: grid; place-items: center; font-weight: 700; }
+
+  .content { padding: 27px 30px 28px; flex: 1; display: flex; flex-direction: column; }
+  .heading { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 22px; }
+  .heading h1 { margin: 0; font-family: Georgia, "Noto Serif SC", "Songti SC", serif; font-size: 32px; letter-spacing: .03em; }
+  .heading p { margin: 8px 0 0; color: var(--muted); font-size: 15px; }
+  .metrics { display: flex; gap: 11px; }
+  .metric { min-width: 112px; padding: 12px 14px; border: 1px solid #2d3548; border-radius: 12px; background: #181d29; }
+  .metric strong { display: block; font-family: Georgia, serif; font-size: 22px; color: #f2c26e; }
+  .metric span { color: #7e89a0; font-size: 12px; }
+
+  .board { flex: 1; display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; min-height: 0; }
+  .column { border: 1px solid #2a3141; border-radius: 15px; background: rgba(23,28,39,.78); padding: 14px; display: flex; flex-direction: column; }
+  .column-head { display: flex; align-items: center; justify-content: space-between; padding: 2px 3px 14px; }
+  .column-head strong { font-family: Georgia, "Noto Serif SC", serif; font-size: 16px; color: #e9edf6; }
+  .count { min-width: 25px; height: 25px; border-radius: 999px; display: grid; place-items: center; background: #242b3b; color: #aeb7c9; font-size: 12px; }
+  .task {
+    background: linear-gradient(180deg, #202738, #1b2130);
+    border: 1px solid #313a4e; border-radius: 13px;
+    padding: 14px; margin-bottom: 12px;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.025), 0 10px 24px rgba(0,0,0,.15);
+  }
+  .task h3 { margin: 0; font-size: 15px; line-height: 1.4; color: #f1f3f9; }
+  .tag { display: inline-block; margin-top: 10px; padding: 4px 8px; border-radius: 6px; font-size: 11px; font-weight: 700; }
+  .tag.red { color: #ffb2a8; background: rgba(224,106,95,.14); border: 1px solid rgba(224,106,95,.28); }
+  .tag.teal { color: #a6e3c9; background: rgba(84,185,142,.13); border: 1px solid rgba(84,185,142,.25); }
+  .tag.amber { color: #f2ce85; background: rgba(216,163,58,.13); border: 1px solid rgba(216,163,58,.24); }
+  .task p { margin: 10px 0 14px; color: #98a3b8; font-size: 13px; line-height: 1.55; }
+  .task-meta { display: flex; align-items: center; justify-content: space-between; color: #7f8aa0; font-size: 12px; }
+  .members { display: flex; }
+  .mini { width: 24px; height: 24px; border-radius: 50%; border: 2px solid #222a3a; background: #3b4a63; color: #dce4f4; display: grid; place-items: center; font-size: 11px; margin-left: -7px; }
+  .mini:first-child { margin-left: 0; }
+  .progress { height: 5px; margin-top: 13px; border-radius: 99px; background: #2a3141; overflow: hidden; }
+  .progress span { display: block; height: 100%; border-radius: 99px; background: linear-gradient(90deg, #d8a33a, #f1cd78); box-shadow: 0 0 12px rgba(216,163,58,.28); }
+  .progress.teal span { background: linear-gradient(90deg, #3f8a6d, #54b98e); box-shadow: 0 0 12px rgba(84,185,142,.22); }
+</style>
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="sigil">会</div>
+        <div><strong>冒险者公会</strong><small>Task Guild · Ops</small></div>
+      </div>
+      <nav class="nav">
+        <div class="nav-item active"><span class="glyph"></span>任务大厅</div>
+        <div class="nav-item"><span class="glyph"></span>我的委托</div>
+        <div class="nav-item"><span class="glyph"></span>总览看板</div>
+        <div class="nav-item"><span class="glyph"></span>员工统计</div>
+        <div class="nav-item"><span class="glyph"></span>消息中心</div>
+        <div class="nav-item"><span class="glyph"></span>系统设置</div>
+      </nav>
+      <div class="side-card">
+        <span class="label">本周团队负载</span>
+        <strong>68%</strong>
+        <div class="bar"><span></span></div>
+      </div>
+    </aside>
+
+    <section class="main">
+      <header class="topbar">
+        <div class="status"><span class="pulse"></span>实时同步已连接 · 3 个任务正在推进</div>
+        <div class="actions">
+          <button class="command">发布新委托</button>
+          <div class="avatar">林</div>
+        </div>
+      </header>
+
+      <div class="content">
+        <div class="heading">
+          <div>
+            <h1>任务大厅</h1>
+            <p>用状态列追踪每一份委托，高风险任务会优先浮出。</p>
+          </div>
+          <div class="metrics">
+            <div class="metric"><strong>28</strong><span>进行中</span></div>
+            <div class="metric"><strong>12</strong><span>待审核</span></div>
+            <div class="metric"><strong>86%</strong><span>按时率</span></div>
+          </div>
+        </div>
+
+        <div class="board">
+          <div class="column">
+            <div class="column-head"><strong>待接取</strong><span class="count">8</span></div>
+            <div class="task">
+              <h3>小程序消息中心文案梳理</h3>
+              <span class="tag teal">设计 · C 级</span>
+              <p>统一通知、审核结果与逾期提醒的措辞。</p>
+              <div class="task-meta"><span>8 月 20 日截止</span><div class="members"><span class="mini">+</span></div></div>
+              <div class="progress"><span style="width: 0%"></span></div>
+            </div>
+            <div class="task">
+              <h3>附件下载流程验收清单</h3>
+              <span class="tag amber">测试 · D 级</span>
+              <p>整理过程件与成果件的版本回溯用例。</p>
+              <div class="task-meta"><span>8 月 23 日截止</span><div class="members"><span class="mini">+</span></div></div>
+              <div class="progress"><span style="width: 0%"></span></div>
+            </div>
+          </div>
+
+          <div class="column">
+            <div class="column-head"><strong>进行中</strong><span class="count">12</span></div>
+            <div class="task">
+              <h3>新版会员中心视觉升级</h3>
+              <span class="tag red">紧急 · S 级</span>
+              <p>统一会员权益页、等级卡与积分明细。</p>
+              <div class="task-meta"><span>8 月 17 日截止</span><div class="members"><span class="mini">林</span><span class="mini">周</span></div></div>
+              <div class="progress"><span style="width: 64%"></span></div>
+            </div>
+            <div class="task">
+              <h3>移动端接单流程走查</h3>
+              <span class="tag amber">产品 · A 级</span>
+              <p>标记异常分支、空状态与关键操作路径。</p>
+              <div class="task-meta"><span>8 月 18 日截止</span><div class="members"><span class="mini">陈</span><span class="mini">林</span></div></div>
+              <div class="progress"><span style="width: 78%"></span></div>
+            </div>
+          </div>
+
+          <div class="column">
+            <div class="column-head"><strong>待审核</strong><span class="count">4</span></div>
+            <div class="task">
+              <h3>Q3 数据看板重构</h3>
+              <span class="tag teal">数据 · B 级</span>
+              <p>替换旧图表为统一统计组件，等待发布官审核。</p>
+              <div class="task-meta"><span>提交于 8 月 14 日</span><div class="members"><span class="mini">周</span><span class="mini">王</span></div></div>
+              <div class="progress teal"><span style="width: 100%"></span></div>
+            </div>
+            <div class="task">
+              <h3>管理端权限矩阵回归</h3>
+              <span class="tag teal">质量 · B 级</span>
+              <p>验证各角色数据可见范围，整理越权用例。</p>
+              <div class="task-meta"><span>提交于 8 月 13 日</span><div class="members"><span class="mini">王</span></div></div>
+              <div class="progress teal"><span style="width: 100%"></span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</body>
+</html>

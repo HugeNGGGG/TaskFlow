@@ -1,0 +1,85 @@
+:root,
+page {
+  /* primitive: dark glass command room */
+  --color-parchment: #151923;
+  --color-parchment-deep: #1b2130;
+  --color-parchment-light: #202738;
+  --color-ink: #eef1f8;
+  --color-ink-muted: #9aa5bb;
+  --color-leather: #d8a33a;
+  --color-leather-dark: #8a5f1a;
+  --color-brass: #e0aa3c;
+  --color-brass-hover: #f1cd78;
+  --color-gold-pale: #f2ce85;
+  --color-seal: #ec746c;
+  --color-seal-soft: #f3a59e;
+  --color-moss: #54c596;
+  --color-moss-pale: #a6e3c9;
+  --color-info: #7ea0e8;
+  --color-border: #2e3649;
+  --color-overlay: rgba(6, 8, 14, 0.46);
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-pill: 999px;
+
+  --font-xs: 12px;
+  --font-sm: 14px;
+  --font-base: 16px;
+  --font-lg: 20px;
+  --font-xl: 28px;
+  --font-2xl: 36px;
+
+  --font-display: 'Iowan Old Style', Georgia, 'Noto Serif SC', 'Songti SC', serif;
+  --font-body: -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+
+  --shadow-sm: 0 1px 0 rgba(255, 255, 255, 0.035) inset, 0 8px 22px rgba(0, 0, 0, 0.16);
+  --shadow-md: 0 1px 0 rgba(255, 255, 255, 0.045) inset, 0 18px 44px rgba(0, 0, 0, 0.24);
+  --shadow-pressed: 0 2px 6px rgba(0, 0, 0, 0.30) inset;
+
+  /* semantic */
+  --color-bg: var(--color-parchment);
+  --color-surface: #181d29;
+  --color-surface-raised: var(--color-parchment-light);
+  --color-accent: var(--color-brass);
+  --color-danger: var(--color-seal);
+  --color-success: var(--color-moss);
+
+  /* component */
+  --card-bg: var(--color-surface-raised);
+  --card-border: #313a4e;
+  --btn-primary-bg: var(--color-brass);
+  --btn-primary-bg-hover: var(--color-brass-hover);
+  --btn-primary-text: #241a08;
+  --badge-urgent-bg: var(--color-seal);
+  --badge-success-bg: var(--color-moss);
+  --timeline-line: #d8a33a;
+  --board-column-bg: rgba(24, 29, 40, 0.36);
+  --header-bg: #12161f;
+  --header-text: #eef1f8;
+
+  /* textures: dark glass + amber command surfaces */
+  --texture-paper:
+    radial-gradient(circle at 22% 12%, rgba(255, 255, 255, 0.055), transparent 30%),
+    radial-gradient(circle at 78% 88%, rgba(224, 170, 60, 0.10), transparent 32%),
+    linear-gradient(180deg, #202738, #1b2130);
+  --texture-wood:
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.025) 0 2px, transparent 2px 9px),
+    linear-gradient(180deg, #181d29 0%, #12161f 100%);
+  --texture-brass:
+    linear-gradient(180deg, #f1cd78 0%, var(--color-brass) 48%, #b47a22 100%);
+
+  /* glassmorphism helpers */
+  --glass-bg: rgba(24, 29, 40, 0.46);
+  --glass-bg-strong: rgba(24, 29, 40, 0.78);
+  --glass-border: rgba(255, 255, 255, 0.10);
+}

@@ -1,0 +1,44 @@
+{
+  "primitive": {
+    "color": {
+      "parchment": "#F2E6C9",
+      "parchmentDeep": "#E9D9B5",
+      "ink": "#2B2118",
+      "inkMuted": "#6B5A48",
+      "leather": "#6B4A2F",
+      "brass": "#B8862E",
+      "brassHover": "#A0721F",
+      "seal": "#9E3B2F",
+      "moss": "#4A6B4A",
+      "info": "#5B728F",
+      "border": "#C9B78F",
+      "overlay": "rgba(43,33,24,0.45)"
+    },
+    "spacing": [4, 8, 12, 16, 24, 32, 48],
+    "radius": [4, 8, 12, 999],
+    "fontSize": [12, 14, 16, 20, 28, 36],
+    "shadow": {
+      "sm": "0 1px 2px rgba(43,33,24,0.08)",
+      "md": "0 4px 14px rgba(43,33,24,0.14)"
+    }
+  },
+  "semantic": {
+    "colorBg": "var(--color-parchment)",
+    "colorSurface": "#F7EED7",
+    "colorSurfaceRaised": "#FFF9EB",
+    "colorAccent": "var(--color-brass)",
+    "colorDanger": "var(--color-seal)",
+    "colorSuccess": "var(--color-moss)"
+  },
+  "component": {
+    "cardBg": "var(--color-surface-raised)",
+    "cardBorder": "var(--color-leather)",
+    "btnPrimaryBg": "var(--color-brass)",
+    "btnPrimaryText": "#FFF8E8",
+    "badgeUrgentBg": "var(--color-seal)",
+    "badgeSuccessBg": "var(--color-moss)",
+    "timelineLine": "#CBB98E",
+    "boardColumnBg": "var(--color-parchment-deep)",
+    "headerBg": "#4A3428"
+  }
+}

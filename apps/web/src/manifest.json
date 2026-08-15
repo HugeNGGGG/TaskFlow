@@ -1,0 +1,25 @@
+{
+  "name": "冒险者公会",
+  "appid": "",
+  "description": "公司内部任务协作平台",
+  "versionName": "0.1.0",
+  "versionCode": "100",
+  "transformPx": false,
+  "h5": {
+    "title": "冒险者公会 · Task Guild",
+    "router": {
+      "mode": "hash"
+    }
+  },
+  "mp-weixin": {
+    "appid": "",
+    "setting": {
+      "urlCheck": false,
+      "es6": true,
+      "minified": true
+    },
+    "usingComponents": true,
+    "lazyCodeLoading": "requiredComponents"
+  },
+  "vueVersion": "3"
+}

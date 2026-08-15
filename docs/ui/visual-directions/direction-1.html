@@ -1,0 +1,301 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>视觉方向 1 · 暖木公会布告栏</title>
+<style>
+  :root {
+    --parchment: #f3e6c8;
+    --parchment-deep: #e7d3a8;
+    --parchment-light: #fff9e8;
+    --ink: #2a2018;
+    --muted: #755f48;
+    --leather: #6b4a2f;
+    --brass: #b8862e;
+    --brass-deep: #93671f;
+    --seal: #9e3b2f;
+    --moss: #4a6b4a;
+    --border: #c9b78f;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; width: 1440px; height: 1024px; overflow: hidden; }
+  body {
+    font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+    color: var(--ink);
+    background:
+      radial-gradient(circle at 18% 12%, rgba(255,255,255,.7), transparent 28%),
+      radial-gradient(circle at 82% 88%, rgba(176,134,46,.12), transparent 34%),
+      repeating-linear-gradient(96deg, rgba(120,86,45,.022) 0 1px, transparent 1px 3px),
+      linear-gradient(145deg, #fbf1d8 0%, #f3e6c8 58%, #e5cf9f 100%);
+  }
+  .page { display: flex; flex-direction: column; height: 100%; }
+
+  .topbar {
+    height: 92px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 34px;
+    color: #f7edd4;
+    background:
+      repeating-linear-gradient(90deg, rgba(255,255,255,.035) 0 2px, transparent 2px 9px),
+      repeating-linear-gradient(0deg, rgba(0,0,0,.08) 0 1px, transparent 1px 4px),
+      linear-gradient(180deg, #5a4130 0%, #4a3428 52%, #38271f 100%);
+    box-shadow: 0 8px 24px rgba(43,33,24,.16);
+    position: relative;
+  }
+  .topbar::before, .topbar::after {
+    content: "";
+    position: absolute;
+    top: 17px;
+    width: 13px;
+    height: 13px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #e2b95f, #9a6d1f 68%, #6e4c16);
+    box-shadow: 0 1px 2px rgba(0,0,0,.35), 0 0 0 3px rgba(255,255,255,.08);
+  }
+  .topbar::before { left: 18px; }
+  .topbar::after { right: 18px; }
+  .brand { display: flex; align-items: center; gap: 15px; }
+  .crest {
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    color: #fff6dd;
+    font-family: Georgia, "Noto Serif SC", "Songti SC", serif;
+    font-weight: 700;
+    background: radial-gradient(circle at 35% 28%, #d6a84b, #a9761f 62%, #6d4b14);
+    border: 2px solid rgba(255,244,205,.75);
+    box-shadow: 0 3px 8px rgba(0,0,0,.28);
+  }
+  .brand h1 {
+    margin: 0;
+    font-family: Georgia, "Noto Serif SC", "Songti SC", serif;
+    font-size: 26px;
+    letter-spacing: .08em;
+  }
+  .brand p { margin: 5px 0 0; font-size: 13px; color: #d8c29b; }
+  .top-actions { display: flex; align-items: center; gap: 22px; }
+  .date { font-family: Georgia, "Noto Serif SC", serif; color: #e7d4ad; font-size: 15px; }
+  .bell { width: 34px; height: 34px; border: 1px solid rgba(255,244,205,.28); border-radius: 50%; display: grid; place-items: center; position: relative; }
+  .bell::before { content: ""; width: 12px; height: 12px; border: 2px solid #f2dfb2; border-radius: 50% 50% 0 0; border-bottom: 0; transform: translateY(-3px); }
+  .bell::after { content: ""; position: absolute; width: 6px; height: 6px; background: #d96a59; border-radius: 50%; top: 5px; right: 5px; }
+  .avatar { width: 42px; height: 42px; border-radius: 50%; background: #c9a36a; border: 2px solid #f5dfad; color: #2a2018; display: grid; place-items: center; font-weight: 700; }
+
+  .hero {
+    padding: 28px 34px 10px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+  }
+  .hero h2 {
+    margin: 0;
+    font-family: Georgia, "Noto Serif SC", "Songti SC", serif;
+    font-size: 38px;
+    font-weight: 700;
+    letter-spacing: .02em;
+  }
+  .hero .subtitle { margin-top: 9px; color: var(--muted); font-size: 16px; }
+  .publish-btn {
+    height: 48px;
+    padding: 0 22px;
+    border-radius: 10px;
+    border: 1px solid #6f4d17;
+    color: #fff8e8;
+    font-weight: 700;
+    background: linear-gradient(180deg, #d2a94e 0%, #b8862e 55%, #98691f 100%);
+    box-shadow: 0 3px 0 #7d571b, 0 8px 16px rgba(107,74,47,.2);
+  }
+
+  .filterbar {
+    margin: 18px 34px 12px;
+    padding: 0 12px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255,249,232,.58);
+    border: 1px solid rgba(201,183,143,.75);
+    border-radius: 14px;
+  }
+  .tab {
+    height: 34px;
+    padding: 0 16px;
+    display: inline-flex;
+    align-items: center;
+    border-radius: 999px;
+    color: #6d5943;
+    font-size: 14px;
+  }
+  .tab.active { background: #6b4a2f; color: #fff7e2; box-shadow: 0 2px 6px rgba(43,33,24,.18); }
+  .spacer { flex: 1; }
+  .filter-pill { color: #755f48; font-size: 14px; }
+
+  .grid {
+    flex: 1;
+    padding: 6px 34px 30px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+    align-content: start;
+  }
+  .card {
+    position: relative;
+    min-height: 242px;
+    padding: 20px 20px 18px;
+    background:
+      radial-gradient(circle at 22% 15%, rgba(255,255,255,.62), transparent 32%),
+      linear-gradient(160deg, #fff9e8 0%, #f8edcf 100%);
+    border: 1px solid #bda67a;
+    border-radius: 12px;
+    box-shadow: 0 1px 0 rgba(255,255,255,.5) inset, 0 10px 26px rgba(74,52,30,.13);
+  }
+  .card::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -8px;
+    height: 11px;
+    background:
+      linear-gradient(135deg, transparent 8px, #f8edcf 0) top left/18px 11px repeat-x,
+      linear-gradient(45deg, transparent 8px, #f8edcf 0) top left/18px 11px repeat-x;
+    opacity: .95;
+  }
+  .seal {
+    position: absolute;
+    top: 17px;
+    right: 18px;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    transform: rotate(-8deg);
+    border: 2px solid rgba(255,255,255,.62);
+    box-shadow: 0 2px 5px rgba(43,33,24,.22);
+  }
+  .seal.moss { background: #4a6b4a; }
+  .seal.brass { background: #b8862e; }
+  .seal.seal { background: #9e3b2f; }
+  .difficulty {
+    display: inline-block;
+    padding: 4px 9px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+    color: #fff8e8;
+    background: #7a6b54;
+  }
+  .card h3 {
+    margin: 16px 42px 8px 0;
+    font-family: Georgia, "Noto Serif SC", "Songti SC", serif;
+    font-size: 21px;
+    line-height: 1.32;
+  }
+  .desc { margin: 0; color: #6d5943; font-size: 14px; line-height: 1.55; min-height: 44px; }
+  .meta { margin-top: 18px; display: flex; align-items: center; justify-content: space-between; color: #7d654b; font-size: 13px; }
+  .progress { height: 7px; margin-top: 13px; border-radius: 99px; background: #e1d2b2; overflow: hidden; }
+  .progress span { display: block; height: 100%; background: linear-gradient(90deg, #c08c2e, #9f6d20); }
+  .card.filled .progress span { background: linear-gradient(90deg, #4a6b4a, #6f8f62); }
+</style>
+</head>
+<body>
+  <div class="page">
+    <header class="topbar">
+      <div class="brand">
+        <div class="crest">会</div>
+        <div>
+          <h1>冒险者公会</h1>
+          <p>Task Guild · 内部任务协作台</p>
+        </div>
+      </div>
+      <div class="top-actions">
+        <div class="date">2026 年 8 月 15 日 · 周五</div>
+        <div class="bell"></div>
+        <div class="avatar">林</div>
+      </div>
+    </header>
+
+    <section class="hero">
+      <div>
+        <h2>任务大厅</h2>
+        <div class="subtitle">悬赏与委托都张贴在这里，接取后即可开工。</div>
+      </div>
+      <button class="publish-btn">发布新委托</button>
+    </section>
+
+    <div class="filterbar">
+      <span class="tab active">全部委托</span>
+      <span class="tab">可接取</span>
+      <span class="tab">进行中</span>
+      <span class="tab">待审核</span>
+      <span class="tab">已结</span>
+      <span class="spacer"></span>
+      <span class="filter-pill">难度 · 部门 · 紧急</span>
+    </div>
+
+    <main class="grid">
+      <article class="card">
+        <div class="seal seal">紧急</div>
+        <span class="difficulty">S 级</span>
+        <h3>新版会员中心视觉升级</h3>
+        <p class="desc">统一会员权益页、等级卡与积分明细，并补齐移动端交互状态。</p>
+        <div class="meta"><span>截止 8 月 17 日</span><span>2 / 3 人</span></div>
+        <div class="progress"><span style="width: 64%"></span></div>
+      </article>
+
+      <article class="card">
+        <div class="seal moss">已结</div>
+        <span class="difficulty">B 级</span>
+        <h3>Q3 数据看板重构</h3>
+        <p class="desc">梳理部门负载与按时交付口径，替换旧图表为统一统计组件。</p>
+        <div class="meta"><span>完成于 8 月 12 日</span><span>3 / 3 人</span></div>
+        <div class="progress"><span style="width: 100%"></span></div>
+      </article>
+
+      <article class="card">
+        <div class="seal brass">待审</div>
+        <span class="difficulty">A 级</span>
+        <h3>移动端接单流程走查</h3>
+        <p class="desc">从委托板到接取确认的关键路径整理，标记异常分支与空状态。</p>
+        <div class="meta"><span>提交于 8 月 15 日</span><span>1 / 2 人</span></div>
+        <div class="progress"><span style="width: 88%"></span></div>
+      </article>
+
+      <article class="card">
+        <div class="seal brass">可接</div>
+        <span class="difficulty">C 级</span>
+        <h3>小程序消息中心文案梳理</h3>
+        <p class="desc">统一通知、审核结果与逾期提醒的措辞，提供关闭订阅入口。</p>
+        <div class="meta"><span>截止 8 月 20 日</span><span>0 / 2 人</span></div>
+        <div class="progress"><span style="width: 0%"></span></div>
+      </article>
+
+      <article class="card">
+        <div class="seal brass">可接</div>
+        <span class="difficulty">D 级</span>
+        <h3>附件下载流程验收清单</h3>
+        <p class="desc">整理过程件与成果件的版本回溯用例，补录常见边界说明。</p>
+        <div class="meta"><span>截止 8 月 23 日</span><span>0 / 1 人</span></div>
+        <div class="progress"><span style="width: 0%"></span></div>
+      </article>
+
+      <article class="card filled">
+        <div class="seal moss">已结</div>
+        <span class="difficulty">B 级</span>
+        <h3>管理端权限矩阵回归</h3>
+        <p class="desc">验证发布官、管理员与冒险者的数据可见范围，整理越权用例。</p>
+        <div class="meta"><span>完成于 8 月 10 日</span><span>2 / 2 人</span></div>
+        <div class="progress"><span style="width: 100%"></span></div>
+      </article>
+    </main>
+  </div>
+</body>
+</html>

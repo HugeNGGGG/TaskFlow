@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>现代视觉方向 2 · 暖玻璃公会板</title>
+<style>
+  :root {
+    --ink: #2a2018;
+    --muted: #775f47;
+    --leather: #6b4a2f;
+    --brass: #c69231;
+    --seal: #a54238;
+    --moss: #4f7250;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; width: 1440px; height: 1024px; overflow: hidden; }
+  body {
+    font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+    color: var(--ink);
+    background:
+      radial-gradient(circle at 12% 18%, rgba(255,246,214,.85), transparent 28%),
+      radial-gradient(circle at 88% 12%, rgba(198,146,49,.25), transparent 28%),
+      radial-gradient(circle at 78% 92%, rgba(164,66,56,.14), transparent 28%),
+      linear-gradient(145deg, #fbf0d5 0%, #f0dfb8 56%, #e5cba0 100%);
+  }
+  .glow { position: fixed; border-radius: 50%; filter: blur(24px); opacity: .55; pointer-events: none; animation: drift 8s ease-in-out infinite; }
+  .glow.a { width: 290px; height: 290px; left: 6%; top: 7%; background: rgba(255,247,222,.85); }
+  .glow.b { width: 240px; height: 240px; right: 7%; top: 16%; background: rgba(198,146,49,.30); animation-delay: -3s; }
+  .glow.c { width: 200px; height: 200px; right: 24%; bottom: 8%; background: rgba(164,66,56,.18); animation-delay: -5s; }
+  @keyframes drift { 0%,100% { transform: translateY(0) scale(1); } 50% { transform: translateY(-22px) scale(1.08); } }
+
+  .app { position: relative; z-index: 1; height: 100%; display: flex; flex-direction: column; }
+  .topbar {
+    margin: 20px 20px 0; height: 78px; border-radius: 22px; padding: 0 26px;
+    display: flex; align-items: center; justify-content: space-between;
+    color: #f7edd4;
+    background: linear-gradient(180deg, rgba(72,51,35,.82), rgba(48,34,24,.84));
+    border: 1px solid rgba(255,236,195,.18);
+    backdrop-filter: blur(20px) saturate(140%);
+    box-shadow: 0 16px 36px rgba(74,52,30,.20);
+  }
+  .brand { display: flex; align-items: center; gap: 14px; }
+  .sigil { width: 46px; height: 46px; border-radius: 50%; display: grid; place-items: center; color: #fff7df; font-family: Georgia, "Noto Serif SC", serif; font-weight: 700; background: radial-gradient(circle at 35% 28%, #e3bd5b, #a9761f 62%, #6d4b14); box-shadow: 0 6px 16px rgba(0,0,0,.26); }
+  .brand h1 { margin: 0; font-family: Georgia, "Noto Serif SC", "Songti SC", serif; font-size: 25px; letter-spacing: .06em; }
+  .brand small { display: block; margin-top: 5px; color: #d8c29b; font-size: 12px; }
+  .top-actions { display: flex; align-items: center; gap: 22px; }
+  .date { color: #e7d4ad; font-size: 14px; }
+  .bell { width: 34px; height: 34px; border-radius: 50%; border: 1px solid rgba(255,236,195,.28); display: grid; place-items: center; position: relative; }
+  .bell::before { content: ""; width: 12px; height: 12px; border: 2px solid #f2dfb2; border-radius: 50% 50% 0 0; border-bottom: 0; transform: translateY(-3px); }
+  .bell::after { content: ""; position: absolute; width: 6px; height: 6px; border-radius: 50%; background: #e28072; top: 5px; right: 5px; animation: blink 1.6s ease-in-out infinite; }
+  @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: .35; } }
+  .avatar { width: 42px; height: 42px; border-radius: 50%; background: rgba(255,236,195,.22); border: 1px solid rgba(255,236,195,.45); color: #f7edd4; display: grid; place-items: center; font-weight: 700; }
+
+  .content { padding: 24px 20px 24px; flex: 1; display: flex; flex-direction: column; }
+  .heading { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 20px; }
+  .heading h2 { margin: 0; font-family: Georgia, "Noto Serif SC", "Songti SC", serif; font-size: 36px; }
+  .heading p { margin: 8px 0 0; color: var(--muted); font-size: 15px; }
+  .publish {
+    height: 46px; padding: 0 20px; border-radius: 13px; border: 1px solid rgba(255,255,255,.2);
+    color: #fff8e8; font-weight: 700; background: linear-gradient(180deg, #d5a84e, #b8862e 58%, #9a6b1e);
+    box-shadow: 0 8px 18px rgba(107,74,47,.22); transition: transform .18s ease;
+  }
+  .publish:hover { transform: translateY(-2px); }
+
+  .filter {
+    height: 54px; margin-bottom: 18px; padding: 0 14px; border-radius: 16px;
+    display: flex; align-items: center; gap: 8px;
+    background: rgba(255,249,232,.46); border: 1px solid rgba(255,255,255,.68);
+    backdrop-filter: blur(16px) saturate(140%);
+  }
+  .tab { height: 34px; padding: 0 16px; border-radius: 999px; color: #7b5f42; font-size: 14px; transition: all .2s ease; }
+  .tab:hover { background: rgba(255,249,232,.65); }
+  .tab.active { background: #6b4a2f; color: #fff7e2; box-shadow: 0 5px 12px rgba(74,52,30,.18); }
+  .spacer { flex: 1; }
+  .filter-pill { color: #7b5f42; font-size: 14px; }
+
+  .grid { flex: 1; display: grid; grid-template-columns: repeat(3, 1fr); gap: 17px; align-content: start; }
+  .card {
+    position: relative; min-height: 252px; padding: 19px; border-radius: 18px;
+    background: rgba(255,249,232,.52); border: 1px solid rgba(255,255,255,.72);
+    backdrop-filter: blur(18px) saturate(145%); box-shadow: 0 16px 38px rgba(74,52,30,.13);
+    transition: transform .28s ease, box-shadow .28s ease;
+    animation: rise .55s ease both;
+  }
+  .card:nth-child(2) { animation-delay: .06s; }
+  .card:nth-child(3) { animation-delay: .12s; }
+  .card:nth-child(4) { animation-delay: .18s; }
+  .card:nth-child(5) { animation-delay: .24s; }
+  .card:nth-child(6) { animation-delay: .30s; }
+  @keyframes rise { from { opacity: 0; transform: translateY(14px) scale(.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
+  .card:hover { transform: translateY(-5px); box-shadow: 0 24px 48px rgba(74,52,30,.18); }
+  .topline { display: flex; align-items: center; justify-content: space-between; }
+  .difficulty { padding: 5px 9px; border-radius: 999px; font-size: 11px; font-weight: 700; color: #fff8e8; background: #7a6b54; }
+  .seal { width: 38px; height: 38px; border-radius: 50%; display: grid; place-items: center; color: #fff; font-size: 11px; font-weight: 700; border: 2px solid rgba(255,255,255,.65); transform: rotate(-8deg); box-shadow: 0 5px 12px rgba(74,52,30,.18); }
+  .seal.moss { background: #4f7250; }
+  .seal.brass { background: #c69231; }
+  .seal.seal { background: #a54238; }
+  .card h3 { margin: 17px 42px 8px 0; font-family: Georgia, "Noto Serif SC", "Songti SC", serif; font-size: 20px; line-height: 1.35; }
+  .card p { margin: 0; color: #765f45; font-size: 14px; line-height: 1.6; }
+  .meta { margin-top: 17px; display: flex; align-items: center; justify-content: space-between; color: #8a6d4c; font-size: 12px; }
+  .progress { height: 6px; margin-top: 13px; border-radius: 99px; background: rgba(120,86,45,.12); overflow: hidden; }
+  .progress i { display: block; height: 100%; border-radius: 99px; background: linear-gradient(90deg, #c69231, #e0bb5e); }
+  .progress.moss i { background: linear-gradient(90deg, #4f7250, #6f9467); }
+  .accept {
+    position: absolute; right: 17px; bottom: 16px; height: 34px; padding: 0 13px; border-radius: 11px; border: 1px solid rgba(255,255,255,.24);
+    color: #fff8e8; font-weight: 700; background: linear-gradient(180deg, #c69231, #a9761f); box-shadow: 0 7px 14px rgba(107,74,47,.20);
+    transition: transform .16s ease;
+  }
+  .accept:hover { transform: scale(1.04); }
+
+  .accept-overlay {
+    position: fixed; inset: 0; z-index: 20; display: none; align-items: center; justify-content: center;
+    background: rgba(43,33,24,.34); backdrop-filter: blur(8px);
+  }
+  .accept-overlay.show { display: flex; animation: fade .2s ease both; }
+  @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
+  .accept-card {
+    width: 360px; padding: 30px; border-radius: 26px; text-align: center;
+    background: rgba(255,249,232,.78); border: 1px solid rgba(255,255,255,.9);
+    backdrop-filter: blur(28px) saturate(150%); box-shadow: 0 30px 80px rgba(43,33,24,.25);
+    animation: stamp .38s cubic-bezier(.2,.9,.25,1.25) both;
+  }
+  @keyframes stamp { from { transform: scale(.72) rotate(-7deg); opacity: 0; } to { transform: scale(1) rotate(-2deg); opacity: 1; } }
+  .check {
+    width: 72px; height: 72px; margin: 0 auto 18px; border-radius: 50%; display: grid; place-items: center;
+    color: #fff; font-size: 30px; font-weight: 800; background: #4f7250; border: 2px solid rgba(255,255,255,.7);
+    box-shadow: 0 0 0 10px rgba(79,114,80,.13), 0 14px 30px rgba(79,114,80,.24);
+  }
+  .accept-card h2 { margin: 0; font-family: Georgia, "Noto Serif SC", serif; font-size: 24px; }
+  .accept-card p { margin: 10px 0 0; color: #775f47; font-size: 15px; }
+</style>
+</head>
+<body>
+  <div class="glow a"></div><div class="glow b"></div><div class="glow c"></div>
+  <div class="app">
+    <header class="topbar">
+      <div class="brand">
+        <div class="sigil">会</div>
+        <div><h1>冒险者公会</h1><small>Task Guild · 内部任务协作台</small></div>
+      </div>
+      <div class="top-actions">
+        <div class="date">2026 年 8 月 15 日 · 周五</div>
+        <div class="bell"></div>
+        <div class="avatar">林</div>
+      </div>
+    </header>
+
+    <div class="content">
+      <div class="heading">
+        <div><h2>任务大厅</h2><p>保留公会质感，但用毛玻璃和弹性动效让它更轻盈。</p></div>
+        <button class="publish">发布新委托</button>
+      </div>
+
+      <div class="filter">
+        <span class="tab active">全部委托</span><span class="tab">可接取</span><span class="tab">进行中</span><span class="tab">待审核</span><span class="tab">已结</span>
+        <span class="spacer"></span><span class="filter-pill">难度 · 部门 · 紧急</span>
+      </div>
+
+      <main class="grid">
+        <article class="card">
+          <div class="topline"><span class="difficulty">S 级</span><span class="seal seal">急</span></div>
+          <h3>新版会员中心视觉升级</h3>
+          <p>统一会员权益页、等级卡与积分明细。</p>
+          <div class="meta"><span>8 月 17 日截止</span><span>2 / 3 人</span></div>
+          <div class="progress"><i style="width:64%"></i></div>
+          <button class="accept" onclick="acceptTask('新版会员中心视觉升级')">接取委托</button>
+        </article>
+
+        <article class="card">
+          <div class="topline"><span class="difficulty">B 级</span><span class="seal moss">已结</span></div>
+          <h3>Q3 数据看板重构</h3>
+          <p>替换旧图表为统一统计组件。</p>
+          <div class="meta"><span>完成于 8 月 12 日</span><span>3 / 3 人</span></div>
+          <div class="progress moss"><i style="width:100%"></i></div>
+          <button class="accept" onclick="acceptTask('Q3 数据看板重构')">查看成果</button>
+        </article>
+
+        <article class="card">
+          <div class="topline"><span class="difficulty">A 级</span><span class="seal brass">待审</span></div>
+          <h3>移动端接单流程走查</h3>
+          <p>标记异常分支、空状态与关键操作路径。</p>
+          <div class="meta"><span>提交于 8 月 15 日</span><span>1 / 2 人</span></div>
+          <div class="progress"><i style="width:88%"></i></div>
+          <button class="accept" onclick="acceptTask('移动端接单流程走查')">查看进度</button>
+        </article>
+
+        <article class="card">
+          <div class="topline"><span class="difficulty">C 级</span><span class="seal brass">可接</span></div>
+          <h3>小程序消息中心文案梳理</h3>
+          <p>统一通知、审核结果与逾期提醒的措辞。</p>
+          <div class="meta"><span>8 月 20 日截止</span><span>0 / 2 人</span></div>
+          <div class="progress"><i style="width:0%"></i></div>
+          <button class="accept" onclick="acceptTask('小程序消息中心文案梳理')">接取委托</button>
+        </article>
+
+        <article class="card">
+          <div class="topline"><span class="difficulty">D 级</span><span class="seal brass">可接</span></div>
+          <h3>附件下载流程验收清单</h3>
+          <p>整理过程件与成果件的版本回溯用例。</p>
+          <div class="meta"><span>8 月 23 日截止</span><span>0 / 1 人</span></div>
+          <div class="progress"><i style="width:0%"></i></div>
+          <button class="accept" onclick="acceptTask('附件下载流程验收清单')">接取委托</button>
+        </article>
+
+        <article class="card">
+          <div class="topline"><span class="difficulty">B 级</span><span class="seal moss">已结</span></div>
+          <h3>管理端权限矩阵回归</h3>
+          <p>验证各角色数据可见范围，整理越权用例。</p>
+          <div class="meta"><span>完成于 8 月 10 日</span><span>2 / 2 人</span></div>
+          <div class="progress moss"><i style="width:100%"></i></div>
+          <button class="accept" onclick="acceptTask('管理端权限矩阵回归')">查看成果</button>
+        </article>
+      </main>
+    </div>
+  </div>
+
+  <div class="accept-overlay" id="acceptOverlay">
+    <div class="accept-card">
+      <div class="check">✓</div>
+      <h2 id="acceptTitle">已接取委托</h2>
+      <p id="acceptText">你已加入协作队伍，可以开始更新进度了。</p>
+    </div>
+  </div>
+
+  <script>
+    function acceptTask(title) {
+      const overlay = document.getElementById('acceptOverlay');
+      document.getElementById('acceptTitle').textContent = '已接取 · ' + title;
+      document.getElementById('acceptText').textContent = '你已加入协作队伍，可以开始更新进度了。';
+      overlay.classList.add('show');
+      setTimeout(() => overlay.classList.remove('show'), 1500);
+    }
+  </script>
+</body>
+</html>

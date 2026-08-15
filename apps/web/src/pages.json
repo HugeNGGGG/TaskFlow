@@ -1,0 +1,128 @@
+{
+  "pages": [
+    {
+      "path": "pages/home/index",
+      "style": {
+        "navigationBarTitleText": "冒险者公会"
+      }
+    },
+    {
+      "path": "pages/index/index",
+      "style": {
+        "navigationBarTitleText": "委托板"
+      }
+    },
+    {
+      "path": "pages/task/detail",
+      "style": {
+        "navigationBarTitleText": "委托详情"
+      }
+    },
+    {
+      "path": "pages/mine/index",
+      "style": {
+        "navigationBarTitleText": "我的委托"
+      }
+    },
+    {
+      "path": "pages/message/index",
+      "style": {
+        "navigationBarTitleText": "消息"
+      }
+    },
+    {
+      "path": "pages/me/index",
+      "style": {
+        "navigationBarTitleText": "我的"
+      }
+    },
+    {
+      "path": "pages/me/settings",
+      "style": {
+        "navigationBarTitleText": "个人设置"
+      }
+    },
+    {
+      "path": "pages/me/rank",
+      "style": {
+        "navigationBarTitleText": "排行榜"
+      }
+    },
+    {
+      "path": "pages/login/login",
+      "style": {
+        "navigationBarTitleText": "登录"
+      }
+    },
+    {
+      "path": "pages/admin/overview",
+      "style": {
+        "navigationBarTitleText": "总览看板"
+      }
+    },
+    {
+      "path": "pages/admin/task-form",
+      "style": {
+        "navigationBarTitleText": "发布委托"
+      }
+    },
+    {
+      "path": "pages/admin/stats",
+      "style": {
+        "navigationBarTitleText": "员工统计"
+      }
+    },
+    {
+      "path": "pages/admin/announcements",
+      "style": {
+        "navigationBarTitleText": "公告管理"
+      }
+    },
+    {
+      "path": "pages/admin/members",
+      "style": {
+        "navigationBarTitleText": "人员管理"
+      }
+    },
+    {
+      "path": "pages/admin/settings",
+      "style": {
+        "navigationBarTitleText": "系统设置"
+      }
+    }
+  ],
+  "globalStyle": {
+    "navigationBarTextStyle": "white",
+    "navigationBarTitleText": "冒险者公会",
+    "navigationBarBackgroundColor": "#12161F",
+    "backgroundColor": "#0E1118"
+  },
+  "tabBar": {
+    "color": "#9AA5BB",
+    "selectedColor": "#F2CE85",
+    "backgroundColor": "#151923",
+    "borderStyle": "white",
+    "list": [
+      {
+        "pagePath": "pages/home/index",
+        "text": "首页"
+      },
+      {
+        "pagePath": "pages/index/index",
+        "text": "委托板"
+      },
+      {
+        "pagePath": "pages/mine/index",
+        "text": "我的委托"
+      },
+      {
+        "pagePath": "pages/message/index",
+        "text": "消息"
+      },
+      {
+        "pagePath": "pages/me/index",
+        "text": "我的"
+      }
+    ]
+  }
+}
