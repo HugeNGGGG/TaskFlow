@@ -2,6 +2,7 @@ import { Body, Controller, Get, Post } from '@nestjs/common';
 import { CurrentUser, Public, type RequestUser } from '../common/decorators';
 import { PrismaService } from '../prisma/prisma.service';
 import { AuthService } from './auth.service';
+import { env } from '../config/env';
 import {
   LoginDto,
   RefreshDto,
@@ -52,7 +53,7 @@ export class AuthController {
 
   @Get('me')
   async me(@CurrentUser() user: RequestUser) {
-    return this.prisma.user.findUniqueOrThrow({
+    const row = await this.prisma.user.findUniqueOrThrow({
       where: { id: user.id },
       select: {
         id: true,
@@ -64,5 +65,11 @@ export class AuthController {
         department: { select: { name: true } },
       },
     });
+    return {
+      ...row,
+      avatarUrl: row.avatarUrl
+        ? `${env.publicBaseUrl}/api/v1/users/${user.id}/avatar`
+        : null,
+    };
   }
 }

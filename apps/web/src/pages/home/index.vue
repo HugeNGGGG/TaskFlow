@@ -16,7 +16,8 @@
         <view class="top-actions">
           <text class="status-dot" />
           <text class="status-text">实时同步已连接</text>
-          <view class="avatar">{{ initials }}</view>
+          <image v-if="auth.user?.avatarUrl" class="avatar avatar-img" :src="auth.user.avatarUrl" mode="aspectFill" />
+          <view v-else class="avatar">{{ initials }}</view>
         </view>
       </view>
 
@@ -241,6 +242,9 @@ onShow(() => {
   font-weight: 700;
   background: rgba(255, 255, 255, 0.06);
   border: 1px solid rgba(224, 170, 60, 0.28);
+}
+.avatar-img {
+  border: 1px solid rgba(224, 170, 60, 0.32);
 }
 .hero {
   display: grid;

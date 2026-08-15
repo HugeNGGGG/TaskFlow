@@ -4,7 +4,8 @@
     <view class="glow glow-b" />
 
     <view class="profile-card">
-      <view class="avatar">{{ initials }}</view>
+      <image v-if="auth.user?.avatarUrl" class="avatar avatar-img" :src="auth.user.avatarUrl" mode="aspectFill" />
+      <view v-else class="avatar">{{ initials }}</view>
       <view class="identity">
         <text class="name">{{ auth.user?.nickname }}</text>
         <text class="username">@{{ auth.user?.username }}</text>
@@ -216,6 +217,9 @@ onShow(() => {
   font-weight: 800;
   background: linear-gradient(145deg, #f2cf77, #c8902c 60%, #8a5f1a);
   box-shadow: 0 12px 28px rgba(224, 170, 60, 0.22);
+}
+.avatar-img {
+  border: 2px solid rgba(224, 170, 60, 0.34);
 }
 .identity {
   flex: 1;

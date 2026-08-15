@@ -5,13 +5,17 @@
 
     <view class="section">
       <text class="section-title">基本资料</text>
+      <view class="avatar-row" @tap="chooseAvatar">
+        <image v-if="avatarUrl" class="avatar-img" :src="avatarUrl" mode="aspectFill" />
+        <view v-else class="avatar-placeholder">{{ initials }}</view>
+        <view class="avatar-action">
+          <text class="avatar-action-title">{{ avatarUrl ? '更换头像' : '上传头像' }}</text>
+          <text class="avatar-action-sub">支持 jpg、png、gif、webp，5MB 以内</text>
+        </view>
+      </view>
       <view class="field-row">
         <text class="field-label">昵称</text>
         <input v-model="nickname" class="field" placeholder="请输入昵称" />
-      </view>
-      <view class="field-row">
-        <text class="field-label">头像链接</text>
-        <input v-model="avatarUrl" class="field" placeholder="可粘贴图片链接，留空则保持当前头像" />
       </view>
       <button class="btn primary" :loading="savingProfile" @tap="saveProfile">保存资料</button>
     </view>
@@ -62,7 +66,12 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { onShow } from '@dcloudio/uni-app';
-import { request, setCachedUser } from '../../api/client';
+import {
+  getAccessToken,
+  PUBLIC_ORIGIN,
+  request,
+  setCachedUser,
+} from '../../api/client';
 import { useAuthStore } from '../../stores/auth';
 
 interface SelfProfile {
@@ -89,6 +98,7 @@ const savingProfile = ref(false);
 const savingPassword = ref(false);
 const inapp = ref<Record<string, boolean>>({});
 const wechat = ref<Record<string, boolean>>({});
+const initials = (auth.user?.nickname ?? '公').slice(0, 1);
 
 const inappItems = [
   { key: 'assign', label: '新指派' },
@@ -141,7 +151,6 @@ async function saveProfile() {
       method: 'PATCH',
       data: {
         nickname: nickname.value.trim(),
-        avatarUrl: avatarUrl.value.trim() || null,
       },
     });
     setCachedUser(updated);
@@ -152,6 +161,59 @@ async function saveProfile() {
   } finally {
     savingProfile.value = false;
   }
+}
+
+function chooseAvatar() {
+  uni.chooseImage({
+    count: 1,
+    success: async (result) => {
+      const filePath = result.tempFilePaths[0];
+      if (!filePath) {
+        return;
+      }
+      try {
+        const updated = await uploadAvatar(filePath);
+        avatarUrl.value = updated.avatarUrl ?? '';
+        setCachedUser(updated);
+        auth.user = updated as unknown as typeof auth.user;
+        uni.showToast({ title: '头像已更新', icon: 'success' });
+      } catch (error) {
+        uni.showToast({ title: (error as { message: string }).message, icon: 'none' });
+      }
+    },
+  });
+}
+
+function uploadAvatar(filePath: string): Promise<SelfProfile> {
+  return new Promise((resolve, reject) => {
+    uni.uploadFile({
+      url: `${PUBLIC_ORIGIN}/api/v1/users/me/avatar`,
+      filePath,
+      name: 'file',
+      header: {
+        Authorization: `Bearer ${getAccessToken()}`,
+      },
+      success: (response) => {
+        if (response.statusCode >= 200 && response.statusCode < 300) {
+          try {
+            resolve(JSON.parse(response.data) as SelfProfile);
+          } catch {
+            reject({ message: '头像保存失败' });
+          }
+        } else {
+          let message = '头像上传失败';
+          try {
+            const body = JSON.parse(response.data) as { message?: string };
+            message = body.message ?? message;
+          } catch {
+            /* keep default */
+          }
+          reject({ message });
+        }
+      },
+      fail: () => reject({ message: '网络异常，请稍后重试' }),
+    });
+  });
 }
 
 async function savePrefs() {
@@ -280,6 +342,49 @@ onShow(() => {
   flex-direction: column;
   gap: 8px;
   margin-bottom: 14px;
+}
+.avatar-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px;
+  margin-bottom: 16px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.045);
+  border: 1px solid rgba(148, 163, 190, 0.18);
+}
+.avatar-img,
+.avatar-placeholder {
+  width: 68px;
+  height: 68px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.avatar-img {
+  border: 2px solid rgba(224, 170, 60, 0.34);
+}
+.avatar-placeholder {
+  display: grid;
+  place-items: center;
+  color: #241a08;
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 800;
+  background: linear-gradient(145deg, #f2cf77, #c8902c 60%, #8a5f1a);
+}
+.avatar-action {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.avatar-action-title {
+  color: #f2ce85;
+  font-size: 15px;
+  font-weight: 700;
+}
+.avatar-action-sub {
+  color: #8d98ad;
+  font-size: 12px;
 }
 .field-label {
   color: #9aa5bb;
